@@ -15,7 +15,7 @@
 load("@rules_bison//bison:bison.bzl", "bison")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@rules_flex//flex:flex.bzl", "flex")
-load("@com_curoky_tame//bazel:copts.bzl", "DEFAULT_CPP_COPTS", "DEFAULT_LINKOPTS")
+load("//:build/bazel/copts.bzl", "DEFAULT_CPP_COPTS", "DEFAULT_LINKOPTS")
 
 flex(
     name = "thriftl",
