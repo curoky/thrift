@@ -1,0 +1,7 @@
+version: '3'
+
+tasks:
+  setup-upstream:
+    cmds:
+     - git remote add upstream https://github.com/apache/thrift
+     - git fetch upstream

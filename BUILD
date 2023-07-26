@@ -15,7 +15,7 @@
 load("@rules_bison//bison:bison.bzl", "bison")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@rules_flex//flex:flex.bzl", "flex")
-load("//:build/bazel/copts.bzl", "DEFAULT_CPP_COPTS", "DEFAULT_LINKOPTS")
+load("//build/bazel:copts.bzl", "DEFAULT_CPP_COPTS", "DEFAULT_LINKOPTS")
 
 flex(
     name = "thriftl",
@@ -86,7 +86,7 @@ cc_library(
         "@boost//:shared_array",
         "@boost//:smart_ptr",
         "@boost//:tokenizer",
-        "@com_github_libevent_libevent//:libevent",
-        "@net_zlib_zlib//:zlib",
+        "@libevent",
+        "@zlib",
     ],
 )
