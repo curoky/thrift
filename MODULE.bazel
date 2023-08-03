@@ -1,0 +1,25 @@
+module(
+    name = "thrift",
+    version = "1.0.0",
+)
+
+bazel_dep(name = "rules_bison", version = "0.2.2")
+bazel_dep(name = "rules_cc", version = "0.0.6")
+bazel_dep(name = "rules_flex", version = "0.2.1")
+bazel_dep(name = "rules_m4", version = "0.2.3")
+
+# https://github.com/AleksanderGondek/rules_cc_hdrs_map/blob/94a8516b62dca8bbe0939349fa85c099fb4c46b2/examples/MODULE.bazel#L28
+bazel_dep(name = "com_github_nelhage_rules_boost", version = "")
+archive_override(
+    module_name = "com_github_nelhage_rules_boost",
+    patches = [
+        "//build/bazel/modules/rules_boost:module.diff",
+    ],
+    strip_prefix = "rules_boost-e60cf50996da9fe769b6e7a31b88c54966ecb191",
+    urls = ["https://github.com/nelhage/rules_boost/archive/e60cf50996da9fe769b6e7a31b88c54966ecb191.tar.gz"],
+)
+
+boost_deps_ext = use_extension("@com_github_nelhage_rules_boost//:extensions.bzl", "boost_deps_ext")
+use_repo(boost_deps_ext, "boost")
+bazel_dep(name = "libevent", version = "")
+bazel_dep(name = "zlib", version = "1.2.13")

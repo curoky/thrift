@@ -15,7 +15,60 @@
 load("@rules_bison//bison:bison.bzl", "bison")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("@rules_flex//flex:flex.bzl", "flex")
-load("//build/bazel:copts.bzl", "DEFAULT_CPP_COPTS", "DEFAULT_LINKOPTS")
+
+DEFAULT_CPP_COPTS = [
+    "-g",
+    "-ggdb",
+    "-O0",
+    "-fno-omit-frame-pointer",
+    "-gno-statement-frontiers",
+    "-gno-variable-location-views",
+    "-Wall",
+    "-Wno-deprecated-declarations",
+    "-Wno-deprecated",
+    "-Wno-sign-compare",
+    "-Wno-unknown-pragmas",
+    "-Wno-unused-but-set-variable",
+    "-Wno-unused-function",
+    "-Wno-unused-value",
+    "-Wno-unused-variable",
+    "-Wno-unused-local-typedefs",
+    "-Wno-maybe-uninitialized",
+]
+
+DEFAULT_LINKOPTS = [
+    "-latomic",
+    "-lpthread",
+    "-ldl",
+]
+
+genrule(
+    name = "genrule_thriftl",
+    srcs = ["compiler/cpp/src/thrift/thriftl.ll"],
+    outs = ["compiler/cpp/src/thrift/thriftl.cc"],
+    cmd = "M4=$(M4) $(FLEX) --outfile=$@ $(location compiler/cpp/src/thrift/thriftl.ll)",
+    toolchains = [
+        "@rules_flex//flex:current_flex_toolchain",
+        "@rules_m4//m4:current_m4_toolchain",
+    ],
+)
+
+genrule(
+    name = "genrule_thrifty",
+    srcs = ["compiler/cpp/src/thrift/thrifty.yy"],
+    outs = [
+      "compiler/cpp/src/thrift/thrifty.hh",
+      "compiler/cpp/src/thrift/thrifty.cc",
+    ],
+    cmd = """
+export M4=$(M4)
+$(BISON) -d $(location compiler/cpp/src/thrift/thrifty.yy) -o $(@D)/compiler/cpp/src/thrift/thrifty.cc
+""",
+    toolchains = [
+        "@rules_bison//bison:current_bison_toolchain",
+        "@rules_m4//m4:current_m4_toolchain",
+    ],
+)
 
 flex(
     name = "thriftl",
@@ -38,7 +91,7 @@ genrule(
         "thrift/thrifty.hh",
         "thrift/thrifty.cc",
     ],
-    cmd = "mkdir -p $(@D)/thrift && mv $(SRCS) $(@D)/thrift/ && mv $(@D)/thrift/thrifty.h $(@D)/thrift/thrifty.hh",
+    cmd = "mkdir -p $(@D)/thrift && mv $(SRCS) $(@D)/thrift",
 )
 
 cc_binary(
@@ -51,8 +104,8 @@ cc_binary(
         ],
         exclude = ["compiler/cpp/src/thrift/logging.cc"],
     ) + [
-        ":thriftl",
-        ":copy_thrifty",
+        ":genrule_thriftl",
+        ":genrule_thrifty",
     ],
     copts = DEFAULT_CPP_COPTS,
     includes = ["compiler/cpp/src"],
